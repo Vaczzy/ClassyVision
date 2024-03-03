@@ -6,7 +6,7 @@
 
 from classy_vision.hooks import register_hook
 from classy_vision.hooks.classy_hook import ClassyHook
-from fvcore.common.file_io import PathManager
+from iopath.common.file_io import g_pathmgr
 
 
 DEFAULT_FILE_NAME = "predictions.csv"
@@ -20,7 +20,7 @@ class OutputCSVHook(ClassyHook):
     def __init__(self, folder, id_key="id", delimiter="\t") -> None:
         super().__init__()
         self.output_path = f"{folder}/{DEFAULT_FILE_NAME}"
-        self.file = PathManager.open(self.output_path, "a")
+        self.file = g_pathmgr.open(self.output_path, "a")
         self.id_key = id_key
         self.delimiter = delimiter
 

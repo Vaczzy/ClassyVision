@@ -17,7 +17,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from classy_vision.generic.distributed_util import broadcast_object, is_primary
-from fvcore.common.file_io import PathManager
+from iopath.common.file_io import g_pathmgr
 
 
 try:
@@ -263,20 +263,20 @@ def load_checkpoint(
     if device.type == "cuda":
         assert torch.cuda.is_available()
 
-    if not PathManager.exists(checkpoint_path):
+    if not g_pathmgr.exists(checkpoint_path):
         logging.warning(f"Checkpoint path {checkpoint_path} not found")
         return None
-    if PathManager.isdir(checkpoint_path):
+    if g_pathmgr.isdir(checkpoint_path):
         checkpoint_path = f"{checkpoint_path.rstrip('/')}/{CHECKPOINT_FILE}"
 
-    if not PathManager.exists(checkpoint_path):
+    if not g_pathmgr.exists(checkpoint_path):
         logging.warning(f"Checkpoint file {checkpoint_path} not found.")
         return None
 
     logging.info(f"Attempting to load checkpoint from {checkpoint_path}")
     # load model on specified device and not on saved device for model and return
     # the checkpoint
-    with PathManager.open(checkpoint_path, "rb") as f:
+    with g_pathmgr.open(checkpoint_path, "rb") as f:
         checkpoint = torch.load(f, map_location=device)
     logging.info(f"Loaded checkpoint from {checkpoint_path}")
     return checkpoint
@@ -339,9 +339,9 @@ def save_checkpoint(checkpoint_folder, state, checkpoint_file=CHECKPOINT_FILE):
     """
 
     # make sure that we have a checkpoint folder:
-    if not PathManager.isdir(checkpoint_folder):
+    if not g_pathmgr.isdir(checkpoint_folder):
         try:
-            PathManager.mkdirs(checkpoint_folder)
+            g_pathmgr.mkdirs(checkpoint_folder)
         except BaseException:
             logging.warning("Could not create folder %s." % checkpoint_folder)
             raise
@@ -349,7 +349,7 @@ def save_checkpoint(checkpoint_folder, state, checkpoint_file=CHECKPOINT_FILE):
     # write checkpoint atomically:
     try:
         full_filename = f"{checkpoint_folder}/{checkpoint_file}"
-        with PathManager.open(full_filename, "wb") as f:
+        with g_pathmgr.open(full_filename, "wb") as f:
             torch.save(state, f)
         return full_filename
     except BaseException:

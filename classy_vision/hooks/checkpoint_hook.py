@@ -11,7 +11,7 @@ from classy_vision.generic.distributed_util import is_primary
 from classy_vision.generic.util import get_checkpoint_dict, save_checkpoint
 from classy_vision.hooks import register_hook
 from classy_vision.hooks.classy_hook import ClassyHook
-from fvcore.common.file_io import PathManager
+from iopath.common.file_io import g_pathmgr
 
 
 @register_hook("checkpoint")
@@ -74,7 +74,7 @@ class CheckpointHook(ClassyHook):
     def _save_checkpoint(self, task, filename):
         if getattr(task, "test_only", False):
             return
-        assert PathManager.exists(
+        assert g_pathmgr.exists(
             self.checkpoint_folder
         ), "Checkpoint folder '{}' deleted unexpectedly".format(self.checkpoint_folder)
 
@@ -85,12 +85,12 @@ class CheckpointHook(ClassyHook):
         )
 
         # make copy of checkpoint that won't be overwritten:
-        PathManager.copy(checkpoint_file, f"{self.checkpoint_folder}/{filename}")
+        g_pathmgr.copy(checkpoint_file, f"{self.checkpoint_folder}/{filename}")
 
     def on_start(self, task) -> None:
         if not is_primary() or getattr(task, "test_only", False):
             return
-        if not PathManager.exists(self.checkpoint_folder):
+        if not g_pathmgr.exists(self.checkpoint_folder):
             err_msg = "Checkpoint folder '{}' does not exist.".format(
                 self.checkpoint_folder
             )

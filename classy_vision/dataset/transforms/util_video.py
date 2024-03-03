@@ -9,7 +9,6 @@ from typing import Any, Callable, Dict, List, Optional, Union
 
 import torch
 import torchvision.transforms as transforms
-import torchvision.transforms._transforms_video as transforms_video
 
 from . import build_transforms, ClassyTransform, register_transform
 from .util import ApplyTransformToKey, ImagenetConstants, TupleToMapTransform
@@ -172,11 +171,12 @@ class VideoDefaultAugmentTransform(ClassyTransform):
 
         self._transform = transforms.Compose(
             [
-                transforms_video.ToTensorVideo(),
+                # torchvision.transforms already support video transformers
+                transforms.ToTensor(),
                 # TODO(zyan3): migrate VideoClipRandomResizeCrop to TorchVision
                 VideoClipRandomResizeCrop(crop_size, size_range),
-                transforms_video.RandomHorizontalFlipVideo(),
-                transforms_video.NormalizeVideo(mean=mean, std=std),
+                transforms.RandomHorizontalFlip(),
+                transforms.Normalize(mean=mean, std=std),
             ]
         )
 
@@ -219,10 +219,10 @@ class VideoDefaultNoAugmentTransform(ClassyTransform):
             # At testing stage, central cropping is not used because we
             # conduct fully convolutional-style testing
             [
-                transforms_video.ToTensorVideo(),
+                transforms.ToTensor(),
                 # TODO(zyan3): migrate VideoClipResize to TorchVision
                 VideoClipResize(size),
-                transforms_video.NormalizeVideo(mean=mean, std=std),
+                transforms.Normalize(mean=mean, std=std),
             ]
         )
 

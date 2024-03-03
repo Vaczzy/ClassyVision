@@ -74,12 +74,9 @@ def build_transform(transform_config: Dict[str, Any]) -> Callable:
             f"{name} isn't a registered tranform"
             ", nor is it available in torchvision.transforms"
         )
-        if hasattr(transforms, name):
-            transform = getattr(transforms, name)(**transform_args)
-        else:
-            import torchvision.transforms._transforms_video as transforms_video
-
-            transform = getattr(transforms_video, name)(**transform_args)
+        # Torchvision.transforms already support video transformer
+        transform = getattr(transforms, name)(**transform_args)
+        
 
     log_class_usage("Transform", transform.__class__)
     return transform

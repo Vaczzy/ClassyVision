@@ -8,7 +8,7 @@ import copy
 import unittest
 
 import torch
-import torchvision.transforms._transforms_video as transforms_video
+import torchvision.transforms as transforms
 from classy_vision.dataset.core.random_video_datasets import RandomVideoDataset
 from classy_vision.dataset.transforms.util_video import (
     build_video_field_transform_default,
@@ -66,13 +66,13 @@ class DatasetTransformUtilVideoTest(unittest.TestCase):
         sample = dataset[1]
         sample_copy = copy.deepcopy(sample)
 
-        expected_output_clip = transforms_video.ToTensorVideo()(
+        expected_output_clip = transforms.ToTensor()(
             sample["input"]["video"]
         )
-        expected_output_clip = transforms_video.CenterCropVideo(
+        expected_output_clip = transforms.CenterCrop(
             VideoConstants.CROP_SIZE
         )(expected_output_clip)
-        expected_output_clip = transforms_video.NormalizeVideo(
+        expected_output_clip = transforms.Normalize(
             mean=VideoConstants.MEAN, std=VideoConstants.STD
         )(expected_output_clip)
 
